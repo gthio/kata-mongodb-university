@@ -1,4 +1,4 @@
-use testdb;
+use test;
 
 //find all
 db.restaurants.find().pretty();
@@ -12,6 +12,9 @@ db.restaurants.find({"address.zipcode": "10075"}).pretty();
 //find, field in an array
 db.restaurants.find({"grades.grade": "B"}).pretty();
 
+//find, field in 
+db.restaurants.find({"borough": { $in: ["Brooklyn", "Queens"] }}).pretty();
+
 //find, greater than operator
 db.restaurants.find({"grades.score": {$gt: 30}}).pretty();
 
@@ -23,6 +26,9 @@ db.restaurants.find({"borough": "Manhattan", "address.zipcode": "10075"}).pretty
 
 //find, logical OR
 db.restaurants.find({$or: [{"borough": "Manhattan"}, {"address.zipcode": "10075"}]}).pretty();
+
+//find, field AND and OR 
+db.restaurants.find({"borough": "Queens", $or: [{ "grades.grade" : "P" }, {"grades.score": {$lt: 2}}]}).pretty();
 
 //find, sort --> asc: 1, desc: -1
 db.restaurants.find().sort({"name": -1, "address.grade": 1}).pretty();
