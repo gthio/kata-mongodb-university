@@ -16,9 +16,19 @@ namespace Course
     {
         static void Main(string[] args)
         {
+            SetConnectionAsync().Wait();
             //InsertOneAsync().Wait();
-            FindAsync().Wait();
+            //FindAsync().Wait();
         }
+
+        public static async Task<int> SetConnectionAsync()
+        {
+            var connectionString = "mongodb://localhost:270171";
+            var client = new MongoClient(connectionString);
+
+            return 1;
+        }
+
 
         public static async Task<int> InsertOneAsync()
         {
