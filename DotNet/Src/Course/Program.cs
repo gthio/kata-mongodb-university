@@ -23,12 +23,19 @@ namespace Course
 
         public static async Task<int> SetConnectionAsync()
         {
-            var connectionString = "mongodb://localhost:270171";
+            var connectionString = "mongodb://localhost:27017";
             var client = new MongoClient(connectionString);
+
+            var connectionSettings = new MongoClientSettings()
+            {
+                Server = new MongoServerAddress("localhost", 27017),
+                MaxConnectionPoolSize = 1000,
+                MinConnectionPoolSize = 300
+            };
+            var client2 = new MongoClient(connectionSettings);
 
             return 1;
         }
-
 
         public static async Task<int> InsertOneAsync()
         {
