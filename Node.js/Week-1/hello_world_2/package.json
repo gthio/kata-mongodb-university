@@ -1,0 +1,13 @@
+{
+  "name": "test",
+  "version": "0.0.0",
+  "description": "",
+  "main": "hello_world_2.js",
+  "dependencies": {
+    "consolidate": "~0.9.1",
+    "express": "~3.2.6",
+    "mongodb": "^2.2.5"
+  },
+  "author": "",
+  "license": ""
+}
