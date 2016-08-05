@@ -1,0 +1,16 @@
+<head>
+<style>
+    body {
+        font-family: 'Arial, Helvetica, sans-serif';
+    }
+</style>
+</head>
+
+<h1>Moview</h1>
+<ul>
+    {% for movie in movies %}
+        <li>{{movie.title}}, {{movie.year}}</li>
+    {% else %}
+        <li>No movies found.</li>
+    {% endfor %}
+</ul>
