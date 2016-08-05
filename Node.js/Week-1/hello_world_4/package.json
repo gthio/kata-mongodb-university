@@ -4,9 +4,10 @@
   "description": "",
   "main": "hello_world_2.js",
   "dependencies": {
-    "consolidate": "~0.9.1",
+    "consolidate": "^0.13.1",
     "express": "^3.2.6",
-    "mongodb": "^2.2.5"
+    "mongodb": "^2.2.5",
+    "nunjucks": "^2.4.2"
   },
   "author": "",
   "license": ""

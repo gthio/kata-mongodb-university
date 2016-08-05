@@ -1,8 +1,14 @@
 var express = require('express'),
-	app = express();
+	app = express(),
+	engines = require('consolidate'),
+	nunjucks = require('nunjucks');
+
+app.engine('html', engines.nunjucks);
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
 
 app.get('/', function(req, res){
-	res.send('Hello world');
+	res.render('hello', {'name': 'Templates'});
 });
 
 app.use(function(req, res){
