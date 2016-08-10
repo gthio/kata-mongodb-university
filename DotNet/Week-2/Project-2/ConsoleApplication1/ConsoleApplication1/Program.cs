@@ -113,6 +113,27 @@ namespace ConsoleApplication1
             {
                 Console.WriteLine(temp);
             }
+
+
+
+
+            var list4a = await col.Find(new BsonDocument())
+                .Project("{Name: 1, _id: 0}")
+                .Project(new BsonDocument("Name", 1).Add("_id", 0))
+                .Project(Builders<BsonDocument>.Projection.Include("Name").Exclude("_id"))
+                .Limit(1)
+                .Skip(5)
+                .Sort("{Age: 1}")
+                .Sort(new BsonDocument("Age", 1))
+                .Sort(Builders<BsonDocument>.Sort.Ascending("Age").Descending("Name"))
+                .ToListAsync();
+
+            var list4b = await col2.Find<Person>(new BsonDocument())
+                .Project(x => new {x.Name, CalcAge = x.Age + 20 })
+                .SortBy(x => x.Age)
+                .ThenBy(x => x.Name)
+                .ToListAsync();
+               
         }
 
     }
