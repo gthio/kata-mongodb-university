@@ -1,0 +1,5 @@
+mongo --shell localhost/performance performance.js
+
+db.sensor_readings.ensureIndex({active:1, tstamp:1});
+
+db.sensor_readings.dropIndexes()
