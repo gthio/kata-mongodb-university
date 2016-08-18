@@ -35,30 +35,22 @@ namespace ConsoleApplication1
 
             var client = new MongoClient(connectionString);
 
-            var db = client.GetDatabase("students");        
-            var col = db.GetCollection<BsonDocument>("grades");
-            var cnt = col.Count(new BsonDocument());
+            var db = client.GetDatabase("school");        
+            var col = db.GetCollection<BsonDocument>("students");
 
-            var previous = "";
-            var deletionList = new List<ObjectId>();
-            
-            await col.Find(new BsonDocument("type", "homework")).Sort("{student_id: 1, score:1 }")
-                .ForEachAsync(x => 
+            await col.Find(new BsonDocument())
+                .ForEachAsync(x =>
                 {
-                    var id = x["_id"].AsObjectId;
-                    var studentID = x["student_id"].ToString();
+                    var name = x["name"].ToString();
+                    var scores = x["scores"].AsBsonArray;
 
-                    if (previous != studentID)
+                    foreach (BsonDocument score in scores)
                     {
-                        deletionList.Add(id);
-                        previous = studentID;
+                        string s = score["type"].ToString();
                     }
-                });
 
-            foreach (var theid in deletionList)
-            {
-                col.DeleteOne(new BsonDocument("_id", theid));
-            }
+                    Console.WriteLine(name);
+                });
         }
     }
 }
