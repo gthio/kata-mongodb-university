@@ -1,0 +1,6 @@
+ConsoleApplication1/obj/*.*
+ConsoleApplication1/obj/debug/*.*
+ConsoleApplication1/bin/*.*
+ConsoleApplication1/bin/debug/*.*
+packages/
+*.suo
