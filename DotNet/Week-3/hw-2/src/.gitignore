@@ -1,0 +1,6 @@
+M101DotNet.WebApp/obj/*.*
+M101DotNet.WebApp/obj/debug/*.*
+M101DotNet.WebApp/bin/*.*
+M101DotNet.WebApp/bin/debug/*.*
+packages/
+*.suo
