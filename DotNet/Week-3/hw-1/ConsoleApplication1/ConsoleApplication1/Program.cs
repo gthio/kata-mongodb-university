@@ -38,19 +38,47 @@ namespace ConsoleApplication1
             var db = client.GetDatabase("school");        
             var col = db.GetCollection<BsonDocument>("students");
 
+            var list = new Dictionary<int, Tuple<string, double>>();
+
             await col.Find(new BsonDocument())
                 .ForEachAsync(x =>
                 {
-                    var name = x["name"].ToString();
+                    var id = x["_id"].ToInt32();
                     var scores = x["scores"].AsBsonArray;
 
                     foreach (BsonDocument score in scores)
                     {
                         string s = score["type"].ToString();
-                    }
+                        var test = score["score"].ToDouble();
 
-                    Console.WriteLine(name);
+                        if (s != "homework")
+                        {
+                            continue;
+                        }
+
+                        if (!list.ContainsKey(id))
+                        {
+                            list.Add(id, new Tuple<string, double>(s, test));
+                        }
+                        else
+                        {
+                            if (list[id].Item2 > test)
+                            {
+                                list[id] = new Tuple<string, double>(s, test);
+                            }
+                        }
+                    }
                 });
+
+            foreach (var item in list)
+            {
+                var z = Builders<BsonDocument>.Filter.Eq("_id", item.Key);
+                var zz = Builders<BsonDocument>.Update.PullFilter("scores",
+                            Builders<BsonDocument>.Filter.Eq("type", item.Value.Item1) &
+                            Builders<BsonDocument>.Filter.Eq("score", item.Value.Item2));
+
+                var result = col.FindOneAndUpdateAsync(z, zz).Result;
+            }
         }
     }
 }
