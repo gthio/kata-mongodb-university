@@ -21,9 +21,22 @@ namespace M101DotNet.WebApp.Controllers
             // find the most recent 10 posts and order them
             // from newest to oldest
 
+            var connectionString = "mongodb://localhost:27017";
+
+            var client = new MongoClient(connectionString);
+
+            var db = client.GetDatabase("blog");
+            var col = db.GetCollection<Post>("posts").Find(x => true == true)
+                .SortByDescending(x => x.CreatedAtUtc)
+                .Limit(10)
+                .Skip(0)
+                .ToListAsync();
+
+            col.Wait();
+
             var model = new IndexModel
             {
-                RecentPosts = recentPosts
+                RecentPosts = col.Result
             };
 
             return View(model);
@@ -44,9 +57,28 @@ namespace M101DotNet.WebApp.Controllers
             }
 
             var blogContext = new BlogContext();
-            // XXX WORK HERE
-            // Insert the post into the posts collection
-            return RedirectToAction("Post", new { id = post.Id });
+
+            var post = new Post()
+            {
+                Title = model.Title,
+                Content = model.Content,
+                Tags = new string[] { model.Tags },
+                Author = this.User.Identity.Name,
+                Comments = new List<Comment>()
+            };
+
+            post.Comments.Add(new Comment() { Content = model.Content,
+                Author = this.User.Identity.Name});
+
+            var connectionString = "mongodb://localhost:27017";
+
+            var client = new MongoClient(connectionString);
+
+            var db = client.GetDatabase("blog");
+            var col = db.GetCollection<Post>("posts");
+            await col.InsertOneAsync(post);
+
+            return RedirectToAction("Post", new { id = post.Id.ToString() });
         }
 
         [HttpGet]
@@ -54,17 +86,26 @@ namespace M101DotNet.WebApp.Controllers
         {
             var blogContext = new BlogContext();
 
-            // XXX WORK HERE
-            // Find the post with the given identifier
+            var connectionString = "mongodb://localhost:27017";
 
-            if (post == null)
+            var client = new MongoClient(connectionString);
+
+            var db = client.GetDatabase("blog");
+            var col = db.GetCollection<Post>("posts")
+                .Find(x => x.Id == ObjectId.Parse(id))
+                .ToListAsync();
+
+            col.Wait();
+
+            if (col.Result == null)
             {
                 return RedirectToAction("Index");
             }
 
             var model = new PostModel
             {
-                Post = post
+                Post = col.Result[0],
+                NewComment = new NewCommentModel()
             };
 
             return View(model);
@@ -80,7 +121,19 @@ namespace M101DotNet.WebApp.Controllers
             // Otherwise, return all the posts.
             // Each of these results should be in descending order.
 
-            return View(posts);
+            var connectionString = "mongodb://localhost:27017";
+
+            var client = new MongoClient(connectionString);
+
+            var db = client.GetDatabase("blog");
+            var col = db.GetCollection<Post>("posts")
+                .Find(x => tag == null || x.Tags.Contains(tag))
+                .SortByDescending(x => x.CreatedAtUtc)
+                .ToListAsync();
+
+            col.Wait();
+
+            return View(col.Result);
         }
 
         [HttpPost]
@@ -95,6 +148,29 @@ namespace M101DotNet.WebApp.Controllers
             // XXX WORK HERE
             // add a comment to the post identified by model.PostId.
             // you can get the author from "this.User.Identity.Name"
+
+            var connectionString = "mongodb://localhost:27017";
+
+            var client = new MongoClient(connectionString);
+
+            var db = client.GetDatabase("blog");
+            var col = db.GetCollection<Post>("posts");
+            var docs = col.Find<Post>(x => x.Id == ObjectId.Parse(model.PostId));
+            var doc = docs.ToListAsync();
+
+            var post = doc.Result[0];
+            var comments = post.Comments;
+
+            var newComment = new Comment()
+            {
+                Content = model.Content,
+                Author = this.User.Identity.Name
+            };
+
+            comments.Add(newComment);
+
+            await col.ReplaceOneAsync<Post>(s => s.Id == ObjectId.Parse(model.PostId),
+                post);
 
             return RedirectToAction("Post", new { id = model.PostId });
         }
