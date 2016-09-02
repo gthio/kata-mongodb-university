@@ -58,6 +58,7 @@ Index properties
 
     - MongoDB to ensure that the index only contain entries for documents that have the indexed fields.
     - Sparse and unique index options can be combined, to reject documents that have duplicate values for a field but ignore documenta that do not have the indexed key
+    - Sparse index cant be used by MongoDB for sorting (reason: it will omit the document with missing field)
 
 - TTL index
     - MongoDB to use this special index, to automatically remove documents from a collection after certain amount of time.
@@ -79,6 +80,19 @@ Index creation
     - sparse
     - expireAfterSeconds
 
+- Mode
+
+    - Foreground
+
+        - Faster
+        - Blocking readers and writers in database
+
+    - Background
+
+        - Slower
+        - Non blocking readers and writers in database
+        - MongoDB can build multiple index in background mode at a time
+
 Examples
 - Ascending index on a single field
 
@@ -87,6 +101,10 @@ Examples
 - Compound index
 
     db.collection.createIndex({ orderDate: 1, zipcode: -1});
+
+- Background Mode
+
+    db.collection.createIndex({ name: 1}, {background: true});
 
 
 Behaviors
